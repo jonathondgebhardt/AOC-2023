@@ -13,9 +13,10 @@ namespace
 
     struct CubeGame
     {
-        CubeGame(const std::string& x)
+        static CubeGame Build(const std::string& x)
         {
-            mId = GetGameId(x);
+            CubeGame cg;
+            cg.mId = GetGameId(x);
 
             const auto start = x.find(':') + 1;
             const auto draws = util::Split(x.substr(start), ';');
@@ -29,21 +30,23 @@ namespace
                     const auto color = tokens.back();
                     if(color == RedCube)
                     {
-                        mValid &= amount <= RedCubeMax;
-                        mRedCubes = std::max(mRedCubes, amount);
+                        cg.mValid &= amount <= RedCubeMax;
+                        cg.mRedCubes = std::max(cg.mRedCubes, amount);
                     }
                     else if(color == GreenCube)
                     {
-                        mValid &= amount <= GreenCubeMax;
-                        mGreenCubes = std::max(mGreenCubes, amount);
+                        cg.mValid &= amount <= GreenCubeMax;
+                        cg.mGreenCubes = std::max(cg.mGreenCubes, amount);
                     }
                     else if(color == BlueCube)
                     {
-                        mValid &= amount <= BlueCubeMax;
-                        mBlueCubes = std::max(mBlueCubes, amount);
+                        cg.mValid &= amount <= BlueCubeMax;
+                        cg.mBlueCubes = std::max(cg.mBlueCubes, amount);
                     }
                 }
             }
+
+            return cg;
         }
 
         static int64_t GetGameId(const std::string& x)
@@ -87,7 +90,8 @@ namespace
         {
             std::vector<CubeGame> games;
             std::transform(mInput.begin(), mInput.end(), std::back_inserter(games),
-                           [](const std::string& line) { return CubeGame{line}; });
+                           &CubeGame::Build);
+
             return std::accumulate(games.begin(), games.end(), 0,
                                    [](int64_t sum, const CubeGame& cg)
                                    {
@@ -100,7 +104,8 @@ namespace
         {
             std::vector<CubeGame> games;
             std::transform(mInput.begin(), mInput.end(), std::back_inserter(games),
-                           [](const std::string& line) { return CubeGame{line}; });
+                           &CubeGame::Build);
+
             return std::accumulate(games.begin(), games.end(), 0,
                                    [](int64_t sum, const CubeGame& cg)
                                    { return sum + cg.GetPower(); });
