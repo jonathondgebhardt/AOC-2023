@@ -20,9 +20,6 @@ std::vector<std::string> util::Parse(const std::string& x)
         {
             contents.push_back(line);
         }
-
-        // Add the trailing new line to preserve input representation.
-        contents.emplace_back();
     }
     else
     {
