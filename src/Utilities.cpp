@@ -37,7 +37,10 @@ std::vector<std::string> util::Split(const std::string& x, char delimiter)
     std::string s;
     while(std::getline(ss, s, delimiter))
     {
-        tokens.push_back(s);
+        if(!s.empty())
+        {
+            tokens.push_back(s);
+        }
     }
 
     return tokens;
