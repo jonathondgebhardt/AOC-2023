@@ -173,7 +173,7 @@ bool CreateSourceFiles(const std::filesystem::path& x)
         ofs << "    const auto answer = CreateSolver(false).solvePartOne();\n";
         ofs << "    ASSERT_NE(answer, std::nullopt);\n";
         ofs << "    // EXPECT_EQ(*answer, INSERT_CORRECT_ANSWER);\n";
-        ofs << "    std::cout << \"part one: \" << *answer << std::endl;\n";
+        ofs << "    std::cout << \"[::::::::::] \" << *answer << std::endl;\n";
         ofs << "}\n";
         ofs << "\n";
         ofs << "TEST(day_" << DAY << ", part_2)\n";
@@ -181,7 +181,7 @@ bool CreateSourceFiles(const std::filesystem::path& x)
         ofs << "    const auto answer = CreateSolver(false).solvePartTwo();\n";
         ofs << "    ASSERT_NE(answer, std::nullopt);\n";
         ofs << "    // EXPECT_EQ(*answer, INSERT_CORRECT_ANSWER);\n";
-        ofs << "    std::cout << \"part two: \" << *answer << std::endl;\n";
+        ofs << "    std::cout << \"[::::::::::] \" << *answer << std::endl;\n";
         ofs << "}\n";
         ofs << "\n";
         ofs << "TEST(day_" << DAY << ", sample_part_1)\n";
@@ -189,6 +189,7 @@ bool CreateSourceFiles(const std::filesystem::path& x)
         ofs << "    const auto answer = CreateSolver(true).solvePartOne();\n";
         ofs << "    ASSERT_NE(answer, std::nullopt);\n";
         ofs << "    // EXPECT_EQ(*answer, PART_ONE_SAMPLE_ANSWER);\n";
+        ofs << "    std::cout << \"[::::::::::] \" << *answer << std::endl;\n";
         ofs << "}\n";
         ofs << "\n";
         ofs << "TEST(day_" << DAY << ", sample_part_2)\n";
@@ -196,6 +197,7 @@ bool CreateSourceFiles(const std::filesystem::path& x)
         ofs << "    const auto answer = CreateSolver(true).solvePartTwo();\n";
         ofs << "    ASSERT_NE(answer, std::nullopt);\n";
         ofs << "    // EXPECT_EQ(*answer, PART_TWO_SAMPLE_ANSWER);\n";
+        ofs << "    std::cout << \"[::::::::::] \" << *answer << std::endl;\n";
         ofs << "}\n";
 
         CREATED_FILES.push_back(fullPath.generic_string());
