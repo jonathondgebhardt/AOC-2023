@@ -3,6 +3,7 @@
 #include <ACSolver.ipp>
 #include <Utilities.ipp>
 #include <gtest/gtest.h>
+#include <numeric>
 
 namespace
 {
@@ -17,266 +18,122 @@ namespace
                     const auto absdiff = [](size_t first, size_t second)
                     { return std::abs(static_cast<int>(first) - static_cast<int>(second)); };
 
-                    if(absdiff(row, x.row) <= 1)
+                    if(absdiff(mRow, x.mRow) <= 1)
                     {
-                        return (start <= x.end && start >= x.start) ||
-                               (end <= x.end && end >= x.start);
+                        // There's probably a gap in my logic, but the comparison below only works
+                        // if you do the comparison from the perpsective of the smaller item.
+                        const auto& [smallest, largest] = [&]() -> std::pair<Item, Item>
+                        {
+                            if(mEnd - mStart < x.mEnd - x.mStart)
+                            {
+                                return {*this, x};
+                            }
+
+                            return {x, *this};
+                        }();
+
+                        return (smallest.mStart <= largest.mEnd &&
+                                smallest.mStart >= largest.mStart) ||
+                               (smallest.mEnd <= largest.mEnd && smallest.mEnd >= largest.mStart);
                     }
 
                     return false;
                 }
 
-                std::string thing;
-                size_t start{0};
-                size_t end{0}; // end is inclusive
-                size_t row{0};
-                bool isStar{false};
+                std::string mThing;
+                size_t mStart{0};
+                size_t mEnd{0}; // end is inclusive
+                size_t mRow{0};
             };
 
-            void dump() const
+            static Machine Build(const std::vector<std::string>& x)
             {
-                for(const auto& item : items)
+                Machine m;
+
+                for(auto i = 0; i < x.size(); ++i)
                 {
-                    std::cout << item.thing << " (" << item.row << ", " << item.start << ", "
-                              << item.end << ")\n";
+                    const auto& line = x[i];
+                    auto j = 0;
+                    while(j < line.size())
+                    {
+                        Machine::Item item;
+                        item.mStart = j;
+                        item.mRow = i;
+
+                        auto c = static_cast<unsigned char>(line[j]);
+                        if(std::ispunct(c))
+                        {
+                            ++j;
+
+                            if(c != '.')
+                            {
+                                item.mThing = std::string(1, c);
+                                item.mEnd = j;
+                                m.mSymbols.push_back(item);
+                            }
+
+                            continue;
+                        }
+
+                        while(std::isdigit(c))
+                        {
+                            item.mThing += std::string(1, c);
+
+                            ++j;
+                            c = static_cast<unsigned char>(line[j]);
+                        }
+
+                        item.mEnd = j;
+                        m.mNumbers.push_back(item);
+                    }
                 }
+
+                return m;
             }
 
-            std::vector<Item> getStars() const
-            {
-                std::vector<Item> stars;
-                std::copy_if(items.begin(), items.end(), std::back_inserter(stars),
-                             [](const Item& i) { return i.isStar; });
-                return stars;
-            }
-
-            std::vector<Item> getNumbers() const
-            {
-                std::vector<Item> numbers;
-                std::copy_if(items.begin(), items.end(), std::back_inserter(numbers),
-                             [](const Item& i) { return !i.isStar; });
-                return numbers;
-            }
-
-            std::vector<Item> items;
+            std::vector<Item> mSymbols;
+            std::vector<Item> mNumbers;
         };
 
-        bool getIsPartNumber(size_t begin, size_t end, size_t row)
-        {
-            const auto isSymbol = [](const char c)
-            { return c != '.' && std::ispunct(static_cast<unsigned char>(c)); };
-
-            assert(begin < end);
-
-            // TODO: Can I use regex instead?
-            // For all characters between begin and end:
-            for(auto i = begin; i < end; ++i)
-            {
-                // North
-                if(static_cast<int>(row - 1) >= 0)
-                {
-                    const auto& previousRow = mInput[row - 1];
-
-                    // NW (i - 1)(row - 1)
-                    if(static_cast<int>(i - 1) >= 0 && isSymbol(previousRow[i - 1]))
-                    {
-                        return true;
-                    }
-
-                    // N (i)(row - 1)
-                    if(isSymbol(previousRow[i]))
-                    {
-                        return true;
-                    }
-
-                    // NE (i + 1)(row - 1)
-                    if(i + 1 < previousRow.size() && isSymbol(previousRow[i + 1]))
-                    {
-                        return true;
-                    }
-                }
-
-                {
-                    const auto& currentRow = mInput[row];
-
-                    // E (i + 1)(row)
-                    if(i + 1 < currentRow.size() && isSymbol(currentRow[i + 1]))
-                    {
-                        return true;
-                    }
-
-                    // W (i - 1)(row
-                    if(static_cast<int>(i - 1) >= 0 && isSymbol(currentRow[i - 1]))
-                    {
-                        return true;
-                    }
-                }
-
-                // South
-                if(row + 1 < mInput.size())
-                {
-                    const auto& nextRow = mInput[row + 1];
-
-                    // SW (i - 1)(row + 1)
-                    if(static_cast<int>(i - 1) >= 0 && isSymbol(nextRow[i - 1]))
-                    {
-                        return true;
-                    }
-
-                    // S (i)(row + 1)
-                    if(isSymbol(nextRow[i]))
-                    {
-                        return true;
-                    }
-
-                    // SE (i + 1)(row + 1)
-                    if(i + 1 < nextRow.size() && isSymbol(nextRow[i + 1]))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        // I had an idea to use regex to find numbers in a line. Each submatch would be a different
-        // number. Then I could build a string based on the surrounding characters (N, S, E, W, etc)
-        // and use regex to check if there are any "symbols". I think this solution would be a
-        // little simpler but it may not be performant due to regex.
         Answer solvePartOne() override
         {
-            int64_t answer{0};
+            const auto m = Machine::Build(mInput);
 
-            for(auto i = 0; i < mInput.size(); ++i)
+            const auto partNumberAccumulator = [&m](int64_t sum, const Machine::Item& number)
             {
-                const auto& line = mInput[i];
-                std::optional<size_t> numberStart;
-                std::optional<size_t> numberEnd;
-                for(auto j = 0; j < line.size(); ++j)
-                {
-                    if(std::isdigit(static_cast<unsigned char>(line[j])))
-                    {
-                        if(numberStart.has_value())
-                        {
-                            numberEnd = j + 1;
-                        }
-                        else
-                        {
-                            numberStart = j;
-
-                            // The number may be one digit long.
-                            numberEnd = j + 1;
-                        }
-                    }
-
-                    // TODO: Kinda gross. I don't like repeating the inverse of the previous
-                    // conditional. We can't use an else though.
-                    // If we have a start and end and we found a non-number or we're at the end of
-                    // the line, check if this number is a part number.
-                    if((!std::isdigit(static_cast<unsigned char>(line[j])) ||
-                        j == line.size() - 1) &&
-                       numberStart.has_value() && numberEnd.has_value())
-                    {
-                        if(getIsPartNumber(*numberStart, *numberEnd, i))
-                        {
-                            const auto length = *numberEnd - *numberStart;
-                            const auto number =
-                                util::StringTo<int64_t>(line.substr(*numberStart, length));
-                            answer += number;
-                        }
-
-                        numberStart.reset();
-                        numberEnd.reset();
-                    }
-                }
-            }
-
-            return answer;
+                const auto isPartNumber = std::any_of(m.mSymbols.begin(), m.mSymbols.end(),
+                                                      [&number](const Machine::Item& symbol)
+                                                      { return number.isAdjacent(symbol); });
+                return isPartNumber ? sum + util::StringTo<int64_t>(number.mThing) : sum;
+            };
+            return std::accumulate(m.mNumbers.begin(), m.mNumbers.end(), 0, partNumberAccumulator);
         }
 
         Answer solvePartTwo() override
         {
-            Machine m;
+            const auto m = Machine::Build(mInput);
 
-            for(auto i = 0; i < mInput.size(); ++i)
-            {
-                const auto& line = mInput[i];
-                std::optional<size_t> numberStart;
-                std::optional<size_t> numberEnd;
-                for(auto j = 0; j < line.size(); ++j)
-                {
-                    // I hate this logic
-                    if(std::isdigit(static_cast<unsigned char>(line[j])))
-                    {
-                        if(numberStart.has_value())
-                        {
-                            numberEnd = j + 1;
-                        }
-                        else
-                        {
-                            numberStart = j;
+            std::vector<Machine::Item> stars;
+            std::copy_if(m.mSymbols.begin(), m.mSymbols.end(), std::back_inserter(stars),
+                         [](const Machine::Item& symbol) { return symbol.mThing == "*"; });
 
-                            // The number may be one digit long.
-                            numberEnd = j + 1;
-                        }
-                    }
-                    else if(line[j] == '*')
-                    {
-                        Machine::Item item;
-                        item.start = j;
-                        item.end = j + 1;
-                        item.thing = line.substr(item.start, item.end - item.start);
-                        item.row = i;
-                        item.isStar = true;
-                        m.items.push_back(item);
-                    }
+            int64_t gearRatio{0};
 
-                    // TODO: Kinda gross. I don't like repeating the inverse of the previous
-                    // conditional. We can't use an else though.
-                    // If we have a start and end and we found a non-number or we're at the end of
-                    // the line, check if this number is a part number.
-                    if((!std::isdigit(static_cast<unsigned char>(line[j])) ||
-                        j == line.size() - 1) &&
-                       numberStart.has_value() && numberEnd.has_value())
-                    {
-                        Machine::Item item;
-                        item.start = *numberStart;
-                        item.end = *numberEnd;
-                        item.thing = line.substr(item.start, item.end - item.start);
-                        item.row = i;
-                        m.items.push_back(item);
-
-                        numberStart.reset();
-                        numberEnd.reset();
-                    }
-                }
-            }
-
-            const auto stars = m.getStars();
-            const auto numbers = m.getNumbers();
-
-            int64_t sum{0};
             for(const auto& star : stars)
             {
                 std::vector<Machine::Item> adjacentParts;
-                std::copy_if(numbers.begin(), numbers.end(), std::back_inserter(adjacentParts),
-                             [&](const Machine::Item& number)
-                             {
-                                 // We have to do the comparison from the perspective of the star.
-                                 // Machine::Item::isAdjacent isn't generic enough.
-                                 return star.isAdjacent(number);
-                             });
-
+                std::copy_if(
+                    m.mNumbers.begin(), m.mNumbers.end(), std::back_inserter(adjacentParts),
+                    [&star](const Machine::Item& number) { return number.isAdjacent(star); });
                 if(adjacentParts.size() == 2)
                 {
-                    const auto first = util::StringTo<int64_t>(adjacentParts.front().thing);
-                    const auto second = util::StringTo<int64_t>(adjacentParts.back().thing);
-                    sum += first * second;
+                    const auto part1 = util::StringTo<int64_t>(adjacentParts.front().mThing);
+                    const auto part2 = util::StringTo<int64_t>(adjacentParts.back().mThing);
+                    gearRatio += part1 * part2;
                 }
             }
 
-            return sum;
+            return gearRatio;
         }
     };
 
