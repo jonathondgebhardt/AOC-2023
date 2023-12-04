@@ -58,6 +58,20 @@ namespace
             size_t mCardNumber{0};
         };
 
+        static int64_t GetNumberOfCopies(const ScratchCard& sc,
+                                         const std::vector<ScratchCard>& cards)
+        {
+            int64_t copies{static_cast<int64_t>(sc.mNumWinning)};
+
+            for(auto i = 0; i < sc.mNumWinning; ++i)
+            {
+                const auto& copy = cards[sc.mCardNumber + i];
+                copies += GetNumberOfCopies(copy, cards);
+            }
+
+            return copies;
+        }
+
         Answer solvePartOne() override
         {
             std::vector<ScratchCard> cards;
@@ -70,32 +84,12 @@ namespace
 
         Answer solvePartTwo() override
         {
-            std::vector<ScratchCard> originalCards;
-            std::transform(mInput.begin(), mInput.end(), std::back_inserter(originalCards),
+            std::vector<ScratchCard> cards;
+            std::transform(mInput.begin(), mInput.end(), std::back_inserter(cards),
                            &ScratchCard::Build);
-
-            std::vector<ScratchCard> copiedCards;
-            for(auto i = 0; i < originalCards.size(); ++i)
-            {
-                const auto& card = originalCards[i];
-                for(auto j = 0; j < card.mNumWinning; ++j)
-                {
-                    copiedCards.push_back(originalCards[card.mCardNumber + j]);
-                }
-            }
-
-            for(auto i = 0; i < copiedCards.size(); ++i)
-            {
-                const auto card = copiedCards[i];
-                for(auto j = 0; j < card.mNumWinning; ++j)
-                {
-                    const auto index = card.mCardNumber + j;
-                    assert(index < originalCards.size());
-                    copiedCards.push_back(originalCards[index]);
-                }
-            }
-
-            return originalCards.size() + copiedCards.size();
+            return cards.size() + std::accumulate(cards.begin(), cards.end(), 0,
+                                                  [&cards](int64_t sum, const ScratchCard& sc)
+                                                  { return sum + GetNumberOfCopies(sc, cards); });
         }
     };
 
