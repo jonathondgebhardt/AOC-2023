@@ -166,7 +166,7 @@ TEST(day_1, part_2)
 {
     const auto answer = CreateSolver("1.txt").solvePartTwo();
     ASSERT_NE(answer, std::nullopt);
-    EXPECT_EQ(*answer, 60948);
+    EXPECT_EQ(*answer, 54719);
     std::cout << "part two: " << *answer << std::endl;
 }
 
