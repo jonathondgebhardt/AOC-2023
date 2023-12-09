@@ -159,7 +159,7 @@ TEST(day_1, part_1)
     const auto answer = CreateSolver("1.txt").solvePartOne();
     ASSERT_NE(answer, std::nullopt);
     EXPECT_EQ(*answer, 55971);
-    std::cout << "part one: " << *answer << std::endl;
+    std::cout << "[::::::::::] " << *answer << std::endl;
 }
 
 TEST(day_1, part_2)
@@ -167,7 +167,7 @@ TEST(day_1, part_2)
     const auto answer = CreateSolver("1.txt").solvePartTwo();
     ASSERT_NE(answer, std::nullopt);
     EXPECT_EQ(*answer, 60948);
-    std::cout << "part two: " << *answer << std::endl;
+    std::cout << "[::::::::::] " << *answer << std::endl;
 }
 
 TEST(day_1, sample_part_1)
@@ -175,7 +175,7 @@ TEST(day_1, sample_part_1)
     const auto answer = CreateSolver("1_sample_part1.txt").solvePartOne();
     ASSERT_NE(answer, std::nullopt);
     EXPECT_EQ(*answer, 142);
-    std::cout << "part one sample: " << *answer << std::endl;
+    std::cout << "[::::::::::] " << *answer << std::endl;
 }
 
 TEST(day_1, sample_part_2)
@@ -183,5 +183,5 @@ TEST(day_1, sample_part_2)
     const auto answer = CreateSolver("1_sample_part2.txt").solvePartTwo();
     ASSERT_NE(answer, std::nullopt);
     EXPECT_EQ(*answer, 281);
-    std::cout << "part two sample: " << *answer << std::endl;
+    std::cout << "[::::::::::] " << *answer << std::endl;
 }
