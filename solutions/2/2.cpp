@@ -2,6 +2,7 @@
 
 #include <ACSolver.ipp>
 #include <Utilities.ipp>
+#include <algorithm>
 #include <gtest/gtest.h>
 #include <numeric>
 
@@ -92,10 +93,10 @@ namespace
             std::transform(mInput.begin(), mInput.end(), std::back_inserter(games),
                            &CubeGame::Build);
 
-            return std::accumulate(games.begin(), games.end(), 0,
+            return std::accumulate(games.begin(), games.end(), int64_t{0},
                                    [](int64_t sum, const CubeGame& cg)
                                    {
-                                       const auto id = cg.mValid ? cg.mId : 0;
+                                       const auto id = cg.mValid ? cg.mId : int64_t{0};
                                        return sum + id;
                                    });
         }
@@ -106,7 +107,7 @@ namespace
             std::transform(mInput.begin(), mInput.end(), std::back_inserter(games),
                            &CubeGame::Build);
 
-            return std::accumulate(games.begin(), games.end(), 0,
+            return std::accumulate(games.begin(), games.end(), int64_t{0},
                                    [](int64_t sum, const CubeGame& cg)
                                    { return sum + cg.GetPower(); });
         }

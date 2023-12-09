@@ -69,7 +69,7 @@ namespace
                 records.emplace_back(time, distance);
             }
 
-            return std::accumulate(records.begin(), records.end(), 1,
+            return std::accumulate(records.begin(), records.end(), int64_t{1},
                                    [](int64_t product, RaceRecord rr)
                                    { return product * GetWaysToWin(rr); });
         }

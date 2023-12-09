@@ -2,6 +2,7 @@
 
 #include <ACSolver.ipp>
 #include <Utilities.ipp>
+#include <algorithm>
 #include <functional>
 #include <gtest/gtest.h>
 #include <numeric>

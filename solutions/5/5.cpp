@@ -2,6 +2,7 @@
 
 #include <ACSolver.ipp>
 #include <Utilities.ipp>
+#include <algorithm>
 #include <gtest/gtest.h>
 
 namespace
@@ -150,7 +151,8 @@ namespace
 
                 std::cout << "Checking " << start << ", " << range << ":\n";
 
-                // This loop is super slow. I had to add print statements just to make sure progress was being made.
+                // This loop is super slow. I had to add print statements just to make sure progress
+                // was being made.
                 for(auto j = 0; j < range; ++j)
                 {
                     const auto seed = start + j;

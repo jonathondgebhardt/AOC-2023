@@ -2,6 +2,7 @@
 
 #include <ACSolver.ipp>
 #include <Utilities.ipp>
+#include <algorithm>
 #include <gtest/gtest.h>
 #include <numeric>
 
@@ -77,7 +78,7 @@ namespace
             std::vector<ScratchCard> cards;
             std::transform(mInput.begin(), mInput.end(), std::back_inserter(cards),
                            &ScratchCard::Build);
-            return std::accumulate(cards.begin(), cards.end(), 0,
+            return std::accumulate(cards.begin(), cards.end(), int64_t{0},
                                    [](int64_t sum, const ScratchCard& sc)
                                    { return sum + sc.mScore; });
         }
@@ -87,7 +88,7 @@ namespace
             std::vector<ScratchCard> cards;
             std::transform(mInput.begin(), mInput.end(), std::back_inserter(cards),
                            &ScratchCard::Build);
-            return cards.size() + std::accumulate(cards.begin(), cards.end(), 0,
+            return cards.size() + std::accumulate(cards.begin(), cards.end(), int64_t{0},
                                                   [&cards](int64_t sum, const ScratchCard& sc)
                                                   { return sum + GetNumberOfCopies(sc, cards); });
         }

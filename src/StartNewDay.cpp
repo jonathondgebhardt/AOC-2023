@@ -114,12 +114,12 @@ bool CreateCMakeLists(const std::filesystem::path& x)
         ofs << "if(WIN32)\n";
         ofs << "\tset_target_properties(${PROJECT_NAME} PROPERTIES FOLDER \"Solutions\")"
             << "\n";
-        ofs << "target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/inputs/" + dayNumber +
-                   ".txt ${CMAKE_SOURCE_DIR}/inputs/" + dayNumber + "_sample.txt)\n";
+        ofs << "target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/inputs/" + DAY +
+                   ".txt ${CMAKE_SOURCE_DIR}/inputs/" + DAY + "_sample.txt)\n";
         ofs << "endif()\n";
 #endif
 
-        CREATED_FILES.push_back(cmakeLists);
+        CREATED_FILES.push_back(cmakeLists.generic_string());
 
         return true;
     }
@@ -270,12 +270,12 @@ int main(int argc, char** argv)
 
     // TODO: Positional arguments are not showing up in help
     // clang-format off
-    options.add_options()
-        ("day", "The day number to use", cxxopts::value<std::string>()->default_value(GetCurrentDayString()))
-        ("year", "The year to use", cxxopts::value<std::string>()->default_value(GetCurrentYearString()))
-        ("f,force", "Force overwrite", cxxopts::value<bool>()->default_value("false"))
-        ("h,help", "Shows this help message")
-    ;
+	options.add_options()
+		("day", "The day number to use", cxxopts::value<std::string>()->default_value(GetCurrentDayString()))
+		("year", "The year to use", cxxopts::value<std::string>()->default_value(GetCurrentYearString()))
+		("f,force", "Force overwrite", cxxopts::value<bool>()->default_value("false"))
+		("h,help", "Shows this help message")
+		;
     // clang-format on
 
     options.parse_positional({"day", "year"});

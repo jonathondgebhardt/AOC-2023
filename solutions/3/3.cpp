@@ -2,6 +2,7 @@
 
 #include <ACSolver.ipp>
 #include <Utilities.ipp>
+#include <algorithm>
 #include <gtest/gtest.h>
 #include <numeric>
 
@@ -106,7 +107,8 @@ namespace
                                                       { return number.isAdjacent(symbol); });
                 return isPartNumber ? sum + util::StringTo<int64_t>(number.mThing) : sum;
             };
-            return std::accumulate(m.mNumbers.begin(), m.mNumbers.end(), 0, partNumberAccumulator);
+            return std::accumulate(m.mNumbers.begin(), m.mNumbers.end(), int64_t{0},
+                                   partNumberAccumulator);
         }
 
         Answer solvePartTwo() override

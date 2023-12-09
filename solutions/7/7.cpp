@@ -2,6 +2,7 @@
 
 #include <ACSolver.ipp>
 #include <Utilities.ipp>
+#include <algorithm>
 #include <gtest/gtest.h>
 
 namespace
@@ -36,7 +37,7 @@ namespace
 
         std::string mCards;
         size_t mBid{0};
-        HandType mHandType;
+        HandType mHandType{HandType::HighCard};
     };
 
     namespace part1

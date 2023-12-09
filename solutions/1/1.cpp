@@ -2,16 +2,18 @@
 
 #include <ACSolver.ipp>
 #include <Utilities.ipp>
+#include <algorithm>
+#include <array>
 #include <gtest/gtest.h>
 #include <numeric>
 #include <ranges>
 
 namespace
 {
-    constexpr std::array<std::pair<std::string, int64_t>, 9> Numbers = {
-        std::make_pair("one", 1), std::make_pair("two", 2),   std::make_pair("three", 3), std::make_pair("four", 4), std::make_pair("five", 5),
-        std::make_pair("six", 6), std::make_pair("seven", 7), std::make_pair("eight", 8), std::make_pair("nine", 9)};
-
+    std::array<std::pair<std::string, int64_t>, 9> Numbers = {
+        std::make_pair("one", 1),   std::make_pair("two", 2),   std::make_pair("three", 3),
+        std::make_pair("four", 4),  std::make_pair("five", 5),  std::make_pair("six", 6),
+        std::make_pair("seven", 7), std::make_pair("eight", 8), std::make_pair("nine", 9)};
 
     std::vector<std::pair<size_t, int64_t>> GetNumbers(const std::string& x)
     {
@@ -21,7 +23,8 @@ namespace
         {
             if(std::isdigit(static_cast<unsigned char>(x[i])) != 0)
             {
-                const auto number = util::StringTo<int64_t>(std::string(1, static_cast<char>(x[i])));
+                const auto number =
+                    util::StringTo<int64_t>(std::string(1, static_cast<char>(x[i])));
                 numbers.emplace_back(i, number);
             }
         }
@@ -54,7 +57,8 @@ namespace
         {
             const auto numbers = ::GetNumbers(x);
 
-            const auto tens = [&]() -> int64_t {
+            const auto tens = [&]() -> int64_t
+            {
                 if(!numbers.empty())
                 {
                     return numbers.front().second * 10;
@@ -63,7 +67,8 @@ namespace
                 return 0;
             }();
 
-            const auto ones = [&]() -> int64_t {
+            const auto ones = [&]() -> int64_t
+            {
                 if(numbers.size() == 1)
                 {
                     return numbers.front().second;
@@ -82,14 +87,15 @@ namespace
 
     namespace part2
     {
-        int64_t GetCalibrationValue(const std::string& x)
+        static int64_t GetCalibrationValue(const std::string& x)
         {
             auto numbers = ::GetNumbers(x);
             const auto textNumbers = ::GetTextNumbers(x);
             std::copy(textNumbers.begin(), textNumbers.end(), std::back_inserter(numbers));
-            std::sort(numbers.begin(), numbers.end(), [](const std::pair<size_t, int64_t> first, const std::pair<size_t, int64_t> second){
-                  return first.first < second.first;
-            });
+            std::sort(
+                numbers.begin(), numbers.end(),
+                [](const std::pair<size_t, int64_t> first, const std::pair<size_t, int64_t> second)
+                { return first.first < second.first; });
 
             const auto tens = [&]() -> int64_t
             {
@@ -124,15 +130,19 @@ namespace
         Answer solvePartOne() override
         {
             std::vector<int64_t> calibrationValues;
-            std::transform(mInput.begin(), mInput.end(), std::back_inserter(calibrationValues), &part1::GetCalibrationValue);
-            return std::accumulate(calibrationValues.begin(), calibrationValues.end(), 0, std::plus<>());
+            std::transform(mInput.begin(), mInput.end(), std::back_inserter(calibrationValues),
+                           &part1::GetCalibrationValue);
+            return std::accumulate(calibrationValues.begin(), calibrationValues.end(), int64_t{0},
+                                   std::plus<>());
         }
 
         Answer solvePartTwo() override
         {
             std::vector<int64_t> calibrationValues;
-            std::transform(mInput.begin(), mInput.end(), std::back_inserter(calibrationValues), &part2::GetCalibrationValue);
-            return std::accumulate(calibrationValues.begin(), calibrationValues.end(), 0, std::plus<>());
+            std::transform(mInput.begin(), mInput.end(), std::back_inserter(calibrationValues),
+                           &part2::GetCalibrationValue);
+            return std::accumulate(calibrationValues.begin(), calibrationValues.end(), int64_t{0},
+                                   std::plus<>());
         }
     };
 
@@ -156,7 +166,7 @@ TEST(day_1, part_2)
 {
     const auto answer = CreateSolver("1.txt").solvePartTwo();
     ASSERT_NE(answer, std::nullopt);
-    // EXPECT_EQ(*answer, INSERT_CORRECT_ANSWER);
+    EXPECT_EQ(*answer, 60948);
     std::cout << "part two: " << *answer << std::endl;
 }
 
